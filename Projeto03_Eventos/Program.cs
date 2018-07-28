@@ -7,6 +7,8 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Projeto03_Eventos.Dados;
 
 namespace Projeto03_Eventos
 {
@@ -14,7 +16,29 @@ namespace Projeto03_Eventos
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            //BuildWebHost(args).Run();
+            var host = BuildWebHost(args);
+            using (var scope = host.Services.CreateScope())
+            {
+
+                var services = scope.ServiceProvider;
+
+                try
+                {
+                    var context = services.GetRequiredService<EventosContext>();
+                    DbInitializer.Initialize(context);
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                    
+                }
+
+            }
+
+            host.Run();
+
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
